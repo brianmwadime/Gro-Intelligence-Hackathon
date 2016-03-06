@@ -71,12 +71,13 @@ def parse_nass(database_host, database_name, database_user, database_password, s
     groups = api.param_values('group_desc')
     states = api.param_values('state_name')
     # print json.dumps(groups, sort_keys = False, indent = 4)
-    print json.dumps(states, sort_keys = False, indent = 4)
+    # print json.dumps(states, sort_keys = False, indent = 4)
 
 
 
     q = api.query()
-    q.filter('sector_desc', 'CROPS').filter('year', start_date, 'ge').filter('year', end_date, 'le') # .filter('agg_level_desc', '')
+    # filter CROP SECTOR to the COUNTY LEVEL for the start date and end date
+    q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('year', start_date, 'ge').filter('year', end_date, 'le')
 
     print 'Number of Records: {}'.format(q.count())
 
@@ -86,14 +87,15 @@ def parse_nass(database_host, database_name, database_user, database_password, s
 
     else:
         for group in groups:
-            q.filter('sector_desc', 'CROPS').filter('group_desc', group).filter('agg_level_desc', 'COUNTY').filter('year', start_date, 'ge').filter('year', end_date, 'le')
+            q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('year', start_date, 'ge').filter('year', end_date, 'le')
             print 'Number of Records in {}: {}'.format(group, q.count())
             if q.count() > 0 and q.count() <= 50000:
                       save_results(database_host, database_name, database_user, database_password, q.execute())
             else:
                 for state in states:
-                    q.filter('sector_desc', 'CROPS').filter('group_desc', group).filter('agg_level_desc', 'COUNTY').filter('state_name', state).filter('year', start_date, 'ge').filter('year', end_date, 'le')
-                    print 'Number of Records in {}: {}'.format(state, q.count()) 
+                    q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('state_name', state).filter('year', start_date, 'ge').filter('year', end_date, 'le')
+                    # print 'Number of Records in {}: {}'.format(state, q.count()) 
+                    save_results(database_host, database_name, database_user, database_password, q.execute
 
 
 
