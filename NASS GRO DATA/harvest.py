@@ -68,13 +68,16 @@ def parse_nass(database_host, database_name, database_user, database_password, s
     # print json.dumps(api.param_values('source_desc'), sort_keys = False, indent = 4)
 
     q = api.query()
-    q.filter('sector_desc', 'CROPS').filter('year', 2016)# .filter('agg_level_desc', '')
+    q.filter('sector_desc', 'CROPS').filter('year', start_date, 'ge').filter('year', end_date, 'le') # .filter('agg_level_desc', '')
 
     print 'Number of Records: {}'.format(q.count())
 
-    if q.count() > 0:
+    if q.count() > 0 and q.count() <= 50000:
         # print json.dumps(q.execute(), sort_keys = False, indent = 4)
         save_results(database_host, database_name, database_user, database_password, q.execute())
+
+    else:
+        pass
 
 
 def save_results(database_host, database_name, database_user, database_password, data):
