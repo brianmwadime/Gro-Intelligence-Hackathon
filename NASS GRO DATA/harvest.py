@@ -42,6 +42,7 @@ def begin_nass_harvest(database_host, database_name, database_user, database_pas
         table_fact_data += 'VALUE varchar NOT NULL, '
         table_fact_data += 'YEAR varchar NOT NULL'
         table_fact_data += ');'
+        table_fact_data += 'TRUNCATE TABLE fact_data;'
 
         # Create table
         #print table_fact_data
@@ -50,37 +51,37 @@ def begin_nass_harvest(database_host, database_name, database_user, database_pas
         conn.commit()
         
     except Exception as e:
-        print e
+        if conn:
+            conn.rollback()
+        raise Exception("Error: {}".format(3))
 
     finally:
-        if conn:
-            conn.close()
 
-        parse_nass(start_date, end_date)
+        parse_nass(database_host, database_name, database_user, database_password, start_date, end_date)
 
 
 
-def parse_nass(start_date = "2014-01-01", end_date= "2015-01-01"):
+def parse_nass(database_host, database_name, database_user, database_password, start_date = "2014-01-01", end_date= "2015-01-01"):
     # rest.get_param_values("sector_desc")
     api = nassusda.USDAApi(config.API_KEY)
 
     print json.dumps(api.param_values('source_desc'), sort_keys = False, indent = 4)
 
     q = api.query()
-    q.filter('commodity_desc', 'CORN').filter('year', 2016)
+    q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('year', 2016)
 
     print json.dumps(q.count(), sort_keys = False, indent = 4)
 
     print json.dumps(q.execute(), sort_keys = False, indent = 4)
 
-    save_results(q.execute())
+    save_results(database_host, database_name, database_user, database_password, q.execute())
 
 
-def save_results(data):
+def save_results(database_host, database_name, database_user, database_password, data):
     """
     Function to save data to a database table called 'fact_data'
     """
-        # A list of the data
+
     temp_data = []
     for row in data:
         domain = row['domain_desc']
@@ -99,18 +100,17 @@ def save_results(data):
     temp_data = tuple(temp_data)
         
     try:
-        # setup connection for PostgreSQL
+        # get database connection
         conn = db.get_connection(database_host, database_name, database_user, database_password)
 
         cur = conn.cursor()
-        cur = self.conn.cursor()
         query = "INSERT INTO fact_data (domain_desc, commodity_desc, statisticcat_desc, agg_level_desc, country_name, state_name, county_name, unit_desc, value, year) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         cur.executemany(query, temp_data)
             
-        self.conn.commit()
+        conn.commit()
     except psycopg2.DatabaseError as e:
-        if self.conn:
-            self.conn.rollback()
+        if conn:
+            conn.rollback()
         raise Exception("Error: {}".format(3))
 
 
