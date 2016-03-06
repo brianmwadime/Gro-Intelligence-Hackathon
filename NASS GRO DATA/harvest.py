@@ -1,27 +1,27 @@
 import sys
 import getopt
 import db
+import simplejson as json
+import config
 import psycopg2
-#import http.client
-import json
-import requests
+import nassusda
 
 def begin_nass_harvest(database_host, database_name, database_user, database_password,
                        port, start_date, end_date):
-    print "\nThis is a starter script for the Gro Hackathon's NASS harvest. It meets the API " \
-          "requirements defined for the hackathon\n\n"
+    print "\nScript for Gro Hackathon's NASS harvest." # " \
+          # "requirements defined for the hackathon\n\n"
 
     print "Run 'python harvest.py -h' for help\n\n"
-    print "Feel free to edit the entirety of this start script\n"
+    # print "Feel free to edit the entirety of this start script\n"
 
-    print "Supplied Args (some default): "
-    print "Database Host: {}".format(database_host)
-    print "Database Name: {}".format(database_name)
-    print "Database Username: {}".format(database_user)
-    print "Database Password: {}".format(database_password)
-    print "Database Port (hard-coded): {}".format(port)
-    print "Harvest Start Date: {}".format(start_date)
-    print "Harvest End Date: {}\n".format(end_date)
+    # print "Supplied Args (some default): "
+    # print "Database Host: {}".format(database_host)
+    # print "Database Name: {}".format(database_name)
+    # print "Database Username: {}".format(database_user)
+    # print "Database Password: {}".format(database_password)
+    # print "Database Port (hard-coded): {}".format(port)
+    # print "Harvest Start Date: {}".format(start_date)
+    # print "Harvest End Date: {}\n".format(end_date)
 
     try:
         # setup connection for PostgreSQL
@@ -52,6 +52,66 @@ def begin_nass_harvest(database_host, database_name, database_user, database_pas
     except Exception as e:
         print e
 
+    finally:
+        if conn:
+            conn.close()
+
+        parse_nass(start_date, end_date)
+
+
+
+def parse_nass(start_date = "2014-01-01", end_date= "2015-01-01"):
+    # rest.get_param_values("sector_desc")
+    api = nassusda.USDAApi(config.API_KEY)
+
+    print json.dumps(api.param_values('source_desc'), sort_keys = False, indent = 4)
+
+    q = api.query()
+    q.filter('commodity_desc', 'CORN').filter('year', 2016)
+
+    print json.dumps(q.count(), sort_keys = False, indent = 4)
+
+    print json.dumps(q.execute(), sort_keys = False, indent = 4)
+
+    save_results(q.execute())
+
+
+def save_results(data):
+    """
+    Function to save data to a database table called 'fact_data'
+    """
+        # A list of the data
+    temp_data = []
+    for row in data:
+        domain = row['domain_desc']
+        commodity = row['commodity_desc']
+        category = row['statisticcat_desc']
+        geography = row['agg_level_desc']
+        country = row['country_name']
+        state = row['state_name']
+        county = row['county_name']
+        description = row['unit_desc']
+        value = row['Value']
+        year = row['year']
+        temp_data.append([domain, commodity, category, geography, country, state, county, description, value, year])
+        
+    # Convert the list to a tuple
+    temp_data = tuple(temp_data)
+        
+    try:
+        # setup connection for PostgreSQL
+        conn = db.get_connection(database_host, database_name, database_user, database_password)
+
+        cur = conn.cursor()
+        cur = self.conn.cursor()
+        query = "INSERT INTO fact_data (domain_desc, commodity_desc, statisticcat_desc, agg_level_desc, country_name, state_name, county_name, unit_desc, value, year) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cur.executemany(query, temp_data)
+            
+        self.conn.commit()
+    except psycopg2.DatabaseError as e:
+        if self.conn:
+            self.conn.rollback()
+        raise Exception("Error: {}".format(3))
 
 
 # #################################################
@@ -70,9 +130,9 @@ def main(argv):
     database_host = 'localhost'
     database_name = 'gro'
     port = 5432
-    database_user = 'gro'
-    database_password = 'gro123'
-    start_date = '2005-1-1'
+    database_user = 'postgres'
+    database_password = 'bandit'
+    start_date = '2012-01-01'
     end_date = '2015-12-31'
 
     for opt, arg in opts:

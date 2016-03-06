@@ -22,10 +22,31 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="config.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="db.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="harvest.py" />
+    <Compile Include="nass\api.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="nass\exceptions.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="nass\query.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="nass\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="rest.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="nass\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
