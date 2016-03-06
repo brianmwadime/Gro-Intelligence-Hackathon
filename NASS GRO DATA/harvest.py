@@ -95,7 +95,7 @@ def parse_nass(database_host, database_name, database_user, database_password, s
                 for state in states:
                     q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('state_name', state).filter('year', start_date, 'ge').filter('year', end_date, 'le')
                     # print 'Number of Records in {}: {}'.format(state, q.count()) 
-                    save_results(database_host, database_name, database_user, database_password, q.execute
+                    save_results(database_host, database_name, database_user, database_password, q.execute())
 
 
 
