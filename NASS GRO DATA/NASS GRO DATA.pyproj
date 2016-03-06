@@ -29,6 +29,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="harvest.py" />
+    <Compile Include="nassusda\api.py" />
+    <Compile Include="nassusda\exceptions.py" />
+    <Compile Include="nassusda\query.py" />
+    <Compile Include="nassusda\__init__.py" />
     <Compile Include="nass\api.py">
       <SubType>Code</SubType>
     </Compile>
@@ -38,15 +42,19 @@
     <Compile Include="nass\query.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="nass\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="rest.py">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="nassusda\" />
     <Folder Include="nass\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="nassusda\.gitignore" />
+    <Content Include="nassusda\api.pyc" />
+    <Content Include="nassusda\exceptions.pyc" />
+    <Content Include="nassusda\query.pyc" />
+    <Content Include="nassusda\README.md" />
+    <Content Include="nassusda\__init__.pyc" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
