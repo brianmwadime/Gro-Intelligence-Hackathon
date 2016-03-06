@@ -67,6 +67,14 @@ def parse_nass(database_host, database_name, database_user, database_password, s
 
     # print json.dumps(api.param_values('source_desc'), sort_keys = False, indent = 4)
 
+    # store the data groups
+    groups = api.param_values('group_desc')
+    states = api.param_values('state_name')
+    # print json.dumps(groups, sort_keys = False, indent = 4)
+    print json.dumps(states, sort_keys = False, indent = 4)
+
+
+
     q = api.query()
     q.filter('sector_desc', 'CROPS').filter('year', start_date, 'ge').filter('year', end_date, 'le') # .filter('agg_level_desc', '')
 
@@ -77,7 +85,16 @@ def parse_nass(database_host, database_name, database_user, database_password, s
         save_results(database_host, database_name, database_user, database_password, q.execute())
 
     else:
-        pass
+        for group in groups:
+            q.filter('sector_desc', 'CROPS').filter('group_desc', group).filter('agg_level_desc', 'COUNTY').filter('year', start_date, 'ge').filter('year', end_date, 'le')
+            print 'Number of Records in {}: {}'.format(group, q.count())
+            if q.count() > 0 and q.count() <= 50000:
+                      save_results(database_host, database_name, database_user, database_password, q.execute())
+            else:
+                for state in states:
+                    q.filter('sector_desc', 'CROPS').filter('group_desc', group).filter('agg_level_desc', 'COUNTY').filter('state_name', state).filter('year', start_date, 'ge').filter('year', end_date, 'le')
+                    print 'Number of Records in {}: {}'.format(state, q.count()) 
+
 
 
 def save_results(database_host, database_name, database_user, database_password, data):
