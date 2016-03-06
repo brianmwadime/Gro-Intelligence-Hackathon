@@ -2,26 +2,25 @@ import sys
 import getopt
 import db
 import psycopg2
-#import http.client
-import json
-import requests
+import config
+import nass
 
 def begin_nass_harvest(database_host, database_name, database_user, database_password,
                        port, start_date, end_date):
-    print "\nThis is a starter script for the Gro Hackathon's NASS harvest. It meets the API " \
-          "requirements defined for the hackathon\n\n"
+    print "\nScript for Gro Hackathon's NASS harvest." # " \
+          # "requirements defined for the hackathon\n\n"
 
     print "Run 'python harvest.py -h' for help\n\n"
-    print "Feel free to edit the entirety of this start script\n"
+    # print "Feel free to edit the entirety of this start script\n"
 
-    print "Supplied Args (some default): "
-    print "Database Host: {}".format(database_host)
-    print "Database Name: {}".format(database_name)
-    print "Database Username: {}".format(database_user)
-    print "Database Password: {}".format(database_password)
-    print "Database Port (hard-coded): {}".format(port)
-    print "Harvest Start Date: {}".format(start_date)
-    print "Harvest End Date: {}\n".format(end_date)
+    # print "Supplied Args (some default): "
+    # print "Database Host: {}".format(database_host)
+    # print "Database Name: {}".format(database_name)
+    # print "Database Username: {}".format(database_user)
+    # print "Database Password: {}".format(database_password)
+    # print "Database Port (hard-coded): {}".format(port)
+    # print "Harvest Start Date: {}".format(start_date)
+    # print "Harvest End Date: {}\n".format(end_date)
 
     try:
         # setup connection for PostgreSQL
@@ -52,6 +51,26 @@ def begin_nass_harvest(database_host, database_name, database_user, database_pas
     except Exception as e:
         print e
 
+    finally:
+        if conn:
+            conn.close()
+
+        parse_nass(start_date, end_date)
+
+
+
+def parse_nass(start_date = "2014-01-01", end_date= "2015-01-01"):
+    # rest.get_param_values("sector_desc")
+    api = nass.USDAApi(config.API_KEY)
+
+    print api.param_values('source_desc')
+
+    q = api.query()
+    q.filter('commodity_desc', 'CORN').filter('year', 2016)
+
+    print q.count()
+
+    print q.execute()
 
 
 # #################################################
@@ -70,9 +89,9 @@ def main(argv):
     database_host = 'localhost'
     database_name = 'gro'
     port = 5432
-    database_user = 'gro'
-    database_password = 'gro123'
-    start_date = '2005-1-1'
+    database_user = 'postgres'
+    database_password = 'bandit'
+    start_date = '2012-01-01'
     end_date = '2015-12-31'
 
     for opt, arg in opts:

@@ -1,0 +1,3 @@
+[submodule "nass gro data/nass-usda"]
+	path = nass gro data/nass-usda
+	url = git@github.com:brianmwadime/nass-usda.git
