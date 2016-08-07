@@ -1,3 +1,4 @@
+import time
 import sys
 import getopt
 import db
@@ -56,7 +57,6 @@ def begin_nass_harvest(database_host, database_name, database_user, database_pas
         raise Exception("Error: {}".format(3))
 
     finally:
-
         parse_nass(database_host, database_name, database_user, database_password, start_date, end_date)
 
 
@@ -77,9 +77,10 @@ def parse_nass(database_host, database_name, database_user, database_password, s
 
     q = api.query()
     # filter CROP SECTOR to the COUNTY LEVEL for the start date and end date
+    start_time = time.time()
     q.filter('sector_desc', 'CROPS').filter('agg_level_desc', 'COUNTY').filter('year', start_date, 'ge').filter('year', end_date, 'le')
 
-    print 'Number of Records: {}'.format(q.count())
+    print 'It\'s taken {}: seconds to get {}: number of Records'.format((time.time() - start_time), q.count())
 
     if q.count() > 0 and q.count() <= 50000:
         # print json.dumps(q.execute(), sort_keys = False, indent = 4)

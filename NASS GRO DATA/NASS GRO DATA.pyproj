@@ -33,19 +33,9 @@
     <Compile Include="nassusda\exceptions.py" />
     <Compile Include="nassusda\query.py" />
     <Compile Include="nassusda\__init__.py" />
-    <Compile Include="nass\api.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="nass\exceptions.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="nass\query.py">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="nassusda\" />
-    <Folder Include="nass\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nassusda\.gitignore" />
